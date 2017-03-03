@@ -26,7 +26,11 @@ public class Segment {
   }
 
   public double tg() {
-    return (end.y() - start.y()) / (end.x() - start.x());
+    return Math.tan(atan());
+  }
+
+  public double atan() {
+    return Math.atan2(end.y() - start.y(),end.x() - start.x());
   }
 
   public static boolean isIntersect(Segment s1, Segment s2) {

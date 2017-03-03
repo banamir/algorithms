@@ -30,7 +30,7 @@ public class Segment {
   }
 
   public double atan() {
-    return Math.atan2(end.y() - start.y(),end.x() - start.x());
+    return Math.atan2(end.x() - start.x(), end.y() - start.y());
   }
 
   public static boolean isIntersect(Segment s1, Segment s2) {

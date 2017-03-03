@@ -32,7 +32,7 @@ public class VectorOperations {
     }
 
     public static double vectProduct(Point a, Point b){
-        return a.x()*b.x() +  a.y()*b.y();
+        return a.x()*b.y() - b.x()*a.y();
     }
 
     public static boolean intersected(Segment s1, Segment s2){

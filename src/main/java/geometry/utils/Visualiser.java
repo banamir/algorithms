@@ -5,6 +5,7 @@ import geometry.dto.Point;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,23 @@ public class Visualiser extends JFrame {
     cur = subject.get(0);
     lines.add(segment(prev.x(), prev.y(), cur.x(), cur.y()));
     drawLines(lines, color);
+    return this;
+  }
+
+
+  public Visualiser drawPoints(List<Point> points, double radius){
+    return drawPoints(points, radius, Color.BLACK);
+  }
+
+  public Visualiser drawPoints(List<Point> points, double radius, Color color) {
+    if(points.isEmpty()) return this;
+
+    g2.setColor(color);
+
+    for(Point point: points){
+      g2.fill(new Ellipse2D.Double(point.x() - radius, point.y() - radius, 2*radius, 2*radius));
+    }
+
     return this;
   }
 }

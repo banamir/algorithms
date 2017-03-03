@@ -2,7 +2,10 @@ package geometry.convexhull;
 
 import geometry.dto.Point;
 import geometry.dto.Segment;
+import geometry.utils.Visualiser;
 
+import java.awt.*;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -26,22 +29,24 @@ public class GrahamScan {
 
         LinkedList<Segment> convHull = new LinkedList();
 
-        Point minP = Collections.min(points, (Point p1, Point p2)-> Double.compare(p1.x(),p2.x()) );
+        Point minP = Collections.min(points, (Point p1, Point p2)-> Double.compare(p1.y(),p2.y()) );
 
         List<Point> sorted = new ArrayList(points);
-        sorted.sort((Point p1, Point p2)->
-            Double.compare(new Segment(minP, p1).atan(),new Segment(minP, p2).atan()));
-
+        sorted.sort((Point p1, Point p2) ->
+                -Double.compare(new Segment(minP, p1).atan(), new Segment(minP, p2).atan()));
+        //sorted.forEach((p)->System.out.format("%f5.3 %f5.3 %f5.4\n", p.x(), p.y(), new Segment(minP, p).atan()));
         sorted.remove(minP);
         convHull.add(new Segment(minP,sorted.get(0)));
 
         for(int i = 1; i < sorted.size(); i++){
             Point top = sorted.get(i);
-            while(ccw(convHull.peekLast(),top)){
+            System.out.println(vectProduct(diff(convHull.peekLast().start(), convHull.peekLast().end()), diff(convHull.peekLast().start(), top)));
+            while(ccw(convHull.peekLast(), top)){
                 convHull.removeLast();
             }
             convHull.add(new Segment(convHull.peekLast().end(), top));
         }
+        convHull.add(new Segment(convHull.peekLast().end(), minP));
 
         return convHull;
     }
@@ -56,10 +61,32 @@ public class GrahamScan {
      * @return true if the segment and point make counter-clockwise turn
      */
     private static boolean ccw(Segment s, Point p){
-        return vectProduct(diff(s.start(), s.end()), diff(p, s.end())) <= 0;
+        return vectProduct(diff(s.start(), s.end()), diff(s.start(), p)) <= 0;
     }
 
     public static void main(String[] args){
+
+        List<Point> points = new ArrayList<>();
+
+        points.add(new Point(350,150));
+        points.add(new Point(250,250));
+        points.add(new Point(400,300));
+        points.add(new Point(350,400));
+        points.add(new Point(300,300));
+        points.add(new Point(150,350));
+        points.add(new Point(100,100));
+        points.add(new Point(250,100));
+        points.add(new Point(250,150));
+        points.add(new Point(150,250));
+        points.add(new Point(50,200));
+        points.add(new Point(300,250));
+        points.add(new Point(300,350));
+
+        Visualiser vis = new Visualiser();
+
+        List<Segment> convHull = convexHull(points);
+        vis.drawLines(convHull,Color.RED);
+        vis.drawPoints(points, 5., Color.BLUE);
 
     }
 

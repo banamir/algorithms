@@ -107,4 +107,23 @@ public class Segment {
   public String toString() {
     return String.format("Segment{%.1f, %.1f; %.1f, %.1f}", startX(), startY(), endX(), endY());
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Segment)) return false;
+
+    Segment segment = (Segment) o;
+
+    if (start != null ? !start.equals(segment.start) : segment.start != null) return false;
+    return !(end != null ? !end.equals(segment.end) : segment.end != null);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = start != null ? start.hashCode() : 0;
+    result = 31 * result + (end != null ? end.hashCode() : 0);
+    return result;
+  }
 }

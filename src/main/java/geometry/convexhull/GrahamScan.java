@@ -19,10 +19,10 @@ import static geometry.utils.VectorOperations.*;
 public class GrahamScan {
 
     /**
-     * Return a convex hull of a set of points
+     * Return a convex hull of a set of verteses
      * with using Gramah scan.
      *
-     * @param points list of points
+     * @param points list of verteses
      * @return convex Hull
      */
     public static List<Segment> convexHull(List<Point> points){
@@ -34,13 +34,13 @@ public class GrahamScan {
         List<Point> sorted = new ArrayList(points);
         sorted.sort((Point p1, Point p2) ->
                 -Double.compare(new Segment(minP, p1).atan(), new Segment(minP, p2).atan()));
-        //sorted.forEach((p)->System.out.format("%f5.3 %f5.3 %f5.4\n", p.x(), p.y(), new Segment(minP, p).atan()));
+
         sorted.remove(minP);
         convHull.add(new Segment(minP,sorted.get(0)));
 
         for(int i = 1; i < sorted.size(); i++){
             Point top = sorted.get(i);
-            System.out.println(vectProduct(diff(convHull.peekLast().start(), convHull.peekLast().end()), diff(convHull.peekLast().start(), top)));
+
             while(ccw(convHull.peekLast(), top)){
                 convHull.removeLast();
             }
@@ -52,7 +52,7 @@ public class GrahamScan {
     }
 
     /**
-     * Three points are a counter-clockwise turn if ccw > 0, clockwise if
+     * Three verteses are a counter-clockwise turn if ccw > 0, clockwise if
      * ccw < 0, and collinear if ccw = 0 because ccw is a determinant that
      * gives twice the signed  area of the triangle formed by p1, p2 and p3.
      *
@@ -61,7 +61,7 @@ public class GrahamScan {
      * @return true if the segment and point make counter-clockwise turn
      */
     private static boolean ccw(Segment s, Point p){
-        return vectProduct(diff(s.start(), s.end()), diff(s.start(), p)) <= 0;
+        return vectProduct(diff(s.start(), s.end()), diff(s.start(), p)) < 0;
     }
 
     public static void main(String[] args){
@@ -87,6 +87,18 @@ public class GrahamScan {
         List<Segment> convHull = convexHull(points);
         vis.drawLines(convHull,Color.RED);
         vis.drawPoints(points, 5., Color.BLUE);
+
+
+        Thread thread = new Thread( () -> {
+                try {
+                    System.out.println("timer started");
+                    Thread.sleep(5000);
+                    System.out.println("timer done");
+                } catch(InterruptedException e) {
+                }
+                System.exit(0);
+        });
+        thread.start();
 
     }
 

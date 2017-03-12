@@ -44,7 +44,7 @@ public class SutherlandHodgman {
   }
 
   /**
-   * Here we basically compare tangents(angles) of two lines - tg(edge.start, p) and tg(edge).
+   * Here we basically compare tangents(angles) of two lines - tg(side.start, p) and tg(side).
    */
   private static boolean inside(Point p, Segment edge) {
     double y1 = edge.start().y();

@@ -1,6 +1,5 @@
 package geometry.triangulation;
 
-import geometry.convexhull.GrahamScan;
 import geometry.dto.Point;
 import geometry.dto.Segment;
 import geometry.utils.Visualiser;
@@ -90,7 +89,7 @@ public class ConvexHullTriangulation extends AbstractTriangulation {
         Set<Segment> edges = new HashSet();
         for(Triangle T : triangulation){
             for(int i = 0; i < 3; i++){
-                edges.add(T.edge(i));
+                edges.add(T.side(i));
             }
         }
         vis.drawLines(new ArrayList(edges));

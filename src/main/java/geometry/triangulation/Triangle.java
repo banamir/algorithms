@@ -25,7 +25,7 @@ public class Triangle {
         }
     }
 
-    public Segment edge(int i){
+    public Segment side(int i){
         return new Segment(vertex(i),vertex(i + 1));
     }
 
@@ -43,7 +43,7 @@ public class Triangle {
 
     public boolean contains(Point p){
         for(int i = 0; i <= verteses.length; i++){
-            if(vectProduct(diff(vertex(i+1),vertex(i)), diff(p, vertex(i))) < 0){
+            if(vectProduct(diff(vertex(i+1),vertex(i)), diff(p, vertex(i))) < 0.d){
                 return false;
             }
         }
@@ -52,7 +52,7 @@ public class Triangle {
 
     public boolean contains(Segment edge){
         for(int i = 0; i < 3; i++){
-            Segment e = this.edge(i);
+            Segment e = this.side(i);
             if(edge.equals(e) || edge.equals(new Segment(e.end(), e.start()))){
                 return true;
             }

@@ -2,6 +2,8 @@ package geometry.triangulation;
 
 import geometry.dto.Point;
 import geometry.dto.Segment;
+import geometry.triangulation.utils.Determinant;
+import geometry.utils.Visualiser;
 
 import java.util.*;
 
@@ -26,18 +28,29 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
 
         for(int i =0; i < 3; i++){
 
-            Segment edge = T.edge(i);
-            Point p =  new Point(0.5*(edge.endX() + edge.startX()),0.5*(edge.endY() + edge.startY()));
-            List<Triangle> list = getTriangles(p);
+            Segment side = T.side(i);
+            List<Triangle> list = new ArrayList();
+
+            for(Triangle t : triangles){
+                for(int j = 0; j < 3; j++){
+
+                    Segment s = t.side(j);
+
+                    if(side.equals(s) || side.equals(new Segment(s.end(),s.start()))){
+                        list.add(t);
+                        break;
+                    }
+                }
+            }
             list.remove(T);
 
-            if(!list.isEmpty()) { //TODO: if list has a size biggest than one
+            if(!list.isEmpty()) { //TODO: if list has a size larger than one
                 Triangle neighbor = list.get(0);
                 T.setNeighbor(i, neighbor);
 
                 for(int j = 0; j < 3; j++ ){
-                    Segment e = neighbor.edge(j);
-                    if(edge.equals(e) || edge.equals(new Segment(e.end(),e.start())) ){
+                    Segment s = neighbor.side(j);
+                    if(side.equals(s) || side.equals(new Segment(s.end(), s.start())) ){
                         neighbor.setNeighbor(j,T);
                         break;
                     }
@@ -70,6 +83,57 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
         }
 
         return result;
+    }
+
+    protected boolean contains(Triangle T){
+        return triangles.contains(T);
+    }
+
+    protected  boolean canImprove(Triangle T, int side){
+
+        if(T.getNeighbor(side) == null) return false;
+
+        Point   A = T.vertex(0),
+                B = T.vertex(1),
+                C = T.vertex(2),
+                D = findNeighborPoint(T, side);
+
+        double det[][] =
+                {{A.x(),A.y(), A.x()*A.x() + A.y()*A.y(), 1.},
+                 {B.x(),B.y(), B.x()*B.x() + B.y()*B.y(), 1.},
+                 {C.x(),C.y(), C.x()*C.x() + C.y()*C.y(), 1.},
+                 {D.x(),D.y(), D.x()*D.x() + D.y()*D.y(), 1.}};
+
+        return Determinant.det(det, 4) > 0;
+    }
+
+    protected List<Triangle> flip(Triangle T, int side){
+        Triangle neighbor = T.getNeighbor(side);
+
+        Point A = T.vertex(side), B = T.vertex(side + 1),
+              C = T.vertex(side + 2), D = findNeighborPoint(T, side);
+
+        removeTriangle(T);
+        removeTriangle(neighbor);
+        Triangle T1 = new Triangle(C, B, D),
+                 T2 = new Triangle(C, A, D);
+        addTriangle(T1);
+        addTriangle(T2);
+
+        return Arrays.asList(T1, T2);
+
+    }
+
+    private Point findNeighborPoint(Triangle T, int side){
+        Triangle neighbor = T.getNeighbor(side);
+        Point D = null;
+        for(int j  = 0; j < 3; j ++){
+            if(neighbor.getNeighbor(j) == T) {
+                D = neighbor.vertex(j + 2);
+                break;
+            };
+        }
+        return D;
     }
 
 }

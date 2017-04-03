@@ -1,8 +1,9 @@
 package geometry.triangulation;
 
+import edu.princeton.cs.introcs.Draw;
 import geometry.dto.Point;
 import geometry.dto.Segment;
-import geometry.utils.Visualiser;
+import geometry.utils.DrawHelper;
 
 import java.awt.*;
 import java.util.*;
@@ -114,13 +115,10 @@ public class TriangleIterativeDelaunay extends AbstractTriangulation {
         verteses.add(new Point(420,350)); //8
         verteses.add(new Point(380,450)); //9
 
-        Visualiser vis = new Visualiser();
-
-        vis.drawPoints(verteses, 5., Color.BLUE);
-
         Collections.shuffle(verteses);
 
         AbstractTriangulation triangulation = new TriangleIterativeDelaunay(verteses);
+
 
         Set<Segment> edges = new HashSet();
         for(Triangle T : triangulation){
@@ -128,7 +126,18 @@ public class TriangleIterativeDelaunay extends AbstractTriangulation {
                 edges.add(T.side(i));
             }
         }
-        vis.drawLines(new ArrayList(edges));
+
+        List<Segment> segments = new ArrayList<>();
+        segments.addAll(edges);
+
+        Draw draw = new Draw();
+        draw.setCanvasSize(800, 600);
+        draw.setXscale(0,800);
+        draw.setYscale(0,600);
+        draw.setPenColor(Color.RED);
+        DrawHelper.drawSegments(draw,segments);
+        draw.setPenColor(Color.BLUE);
+        DrawHelper.drawPoints(draw,verteses,5.);
     }
 
 

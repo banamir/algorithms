@@ -1,11 +1,11 @@
 package geometry.convexhull;
 
+import edu.princeton.cs.introcs.Draw;
 import geometry.dto.Point;
 import geometry.dto.Segment;
-import geometry.utils.Visualiser;
+import geometry.utils.DrawHelper;
 
 import java.awt.*;
-import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -82,23 +82,18 @@ public class GrahamScan {
         points.add(new Point(300,250));
         points.add(new Point(300,350));
 
-        Visualiser vis = new Visualiser();
+
 
         List<Segment> convHull = convexHull(points);
-        vis.drawLines(convHull,Color.RED);
-        vis.drawPoints(points, 5., Color.BLUE);
 
-
-        Thread thread = new Thread( () -> {
-                try {
-                    System.out.println("timer started");
-                    Thread.sleep(5000);
-                    System.out.println("timer done");
-                } catch(InterruptedException e) {
-                }
-                System.exit(0);
-        });
-        thread.start();
+        Draw draw = new Draw();
+        draw.setCanvasSize(800, 600);
+        draw.setXscale(0,800);
+        draw.setYscale(0,600);
+        draw.setPenColor(Color.RED);
+        DrawHelper.drawSegments(draw,convHull);
+        draw.setPenColor(Color.BLUE);
+        DrawHelper.drawPoints(draw,points,5.);
 
     }
 

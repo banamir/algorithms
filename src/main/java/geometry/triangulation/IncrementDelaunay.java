@@ -15,11 +15,13 @@ import static geometry.utils.VectorOperations.onSegment;
 /**
  * Created by banamir on 09.03.17.
  */
-public class TriangleIterativeDelaunay extends AbstractTriangulation {
+public class IncrementDelaunay extends AbstractTriangulation {
 
-    public TriangleIterativeDelaunay(List<Point> points){
+    public IncrementDelaunay(List<Point> points){
         super(points);
     }
+
+    protected IncrementDelaunay() {}
 
     @Override
     protected void triangulate(List<Point> points) {
@@ -117,7 +119,7 @@ public class TriangleIterativeDelaunay extends AbstractTriangulation {
 
         Collections.shuffle(verteses);
 
-        AbstractTriangulation triangulation = new TriangleIterativeDelaunay(verteses);
+        AbstractTriangulation triangulation = new IncrementDelaunay(verteses);
 
 
         Set<Segment> edges = new HashSet();
@@ -133,11 +135,11 @@ public class TriangleIterativeDelaunay extends AbstractTriangulation {
         Draw draw = new Draw();
         draw.setCanvasSize(800, 600);
         draw.setXscale(0,800);
-        draw.setYscale(0,600);
+        draw.setYscale(0, 600);
         draw.setPenColor(Color.RED);
         DrawHelper.drawSegments(draw,segments);
         draw.setPenColor(Color.BLUE);
-        DrawHelper.drawPoints(draw,verteses,5.);
+        DrawHelper.drawPoints(draw, verteses, 5.);
     }
 
 

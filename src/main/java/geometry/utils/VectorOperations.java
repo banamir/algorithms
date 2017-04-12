@@ -19,6 +19,18 @@ public class VectorOperations {
         return new Point(a.x()-b.x(), a.y()-b.y());
     }
 
+    public static Point add(Point a, Point b){
+        return new Point(a.x()+b.x(), a.y()+b.y());
+    }
+
+    public static Point mult(Point a, double alfa){
+        return new Point(alfa*a.x(), alfa*a.y());
+    }
+
+    public static Point norm(Point a){
+        return new Point(a.y(), -a.x());
+    }
+
     public static double scalarProduct(Point a, Point b){
         return a.x()*b.x() +  a.y()*b.y();
     }

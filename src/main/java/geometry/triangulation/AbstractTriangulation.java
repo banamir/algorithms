@@ -14,6 +14,8 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
 
     private Set<Triangle> triangles = new HashSet();
 
+    protected AbstractTriangulation(){}
+
     public AbstractTriangulation(List<Point> points){
         triangulate(points);
     }

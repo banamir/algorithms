@@ -23,7 +23,7 @@ public class IncrementVoronoi extends IncrementDelaunay {
 
     protected HashMap<Point,TreeSet<Triangle>> vertexMap = new HashMap();
 
-    protected HashMap<Point,List<VoronoiVertex>> tiles = new HashMap();
+    protected HashSet<VoronoiTile> tiles = new HashSet();
 
     public IncrementVoronoi(List<Point> points){
         super();
@@ -65,7 +65,7 @@ public class IncrementVoronoi extends IncrementDelaunay {
                 return Double.compare(angle1,angle2);
             });
 
-            tiles.put(vertex,vs);
+            tiles.add(new VoronoiTile(vertex,vs));
         }
     }
 
@@ -91,12 +91,14 @@ public class IncrementVoronoi extends IncrementDelaunay {
     }
 
 
-    public Entry<Point,List<Point>> tile(Point P){
-        //TODO: implement
+    public VoronoiTile tile(Point p){
+        for(VoronoiTile tile : tiles){
+            if(tile.contains(p)) return tile;
+        }
         return null;
     }
 
-    public HashMap<Point,List<VoronoiVertex>> tilesVoronoi(){
+    public HashSet<VoronoiTile> getTiles(){
         return tiles;
     }
 
@@ -167,7 +169,7 @@ public class IncrementVoronoi extends IncrementDelaunay {
         IncrementVoronoi triangulation = new IncrementVoronoi(verteses);
 
         Draw draw = new Draw();
-        draw.setCanvasSize(1200, 900);
+        draw.setCanvasSize(800, 600);
         draw.setXscale(0, 800);
         draw.setYscale(0, 600);
 
@@ -193,11 +195,12 @@ public class IncrementVoronoi extends IncrementDelaunay {
         DrawHelper.drawPoints(draw, verteses, 5.);
 
         draw.setPenColor(Color.MAGENTA);
-        for(List<VoronoiVertex> lv : triangulation.tilesVoronoi().values()){
+        for(VoronoiTile tile : triangulation.getTiles()){
+            List<VoronoiVertex> lv = new ArrayList<>(tile.voronoiVertices());
             for(int i =0; i < lv.size()-1; i++){
                 Point v1 = lv.get(i).getVertex();
                 Point v2 = lv.get(i+1).getVertex();
-                draw.filledCircle(v1.x(),v1.y(),5.);
+                //draw.filledCircle(v1.x(),v1.y(),5.);
                 draw.line(v1.x(),v1.y(),v2.x(),v2.y());
             }
             if(lv.get(0).getType() == VoronoiVertex.VertexType.INNER){

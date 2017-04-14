@@ -9,7 +9,7 @@ import geometry.dto.Point;
 
 public class VoronoiVertex{
 
-    public enum VertexType {INNER, OUTER} ;
+    public static enum VertexType {INNER, OUTER} ;
 
     private VertexType type;
 

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static geometry.triangulation.voronoi.VoronoiVertex.*;
+import static geometry.utils.VectorOperations.*;
 
 /**
  * Created by banamir on 13.04.17.
@@ -29,37 +30,23 @@ public class VoronoiTile {
     }
 
     public boolean contains(Point p){
-        int cross = 0;
-        double order = 0; //????
+
         int size = voronoiVertices.size();
-        for(int i = 0, j = 0; i < size - 1 ; j = i++ ){
+        for(int i = 1, j = 0; i < size; j = i++ ){
 
-            if(voronoiVertices.get(i).getType() == VertexType.OUTER) continue;
+            Point s = voronoiVertices.get(j).getVertex(),
+                  e = voronoiVertices.get(i).getVertex();
 
-            Point s = voronoiVertices.get(i).getVertex(),
-                  e = voronoiVertices.get(j).getVertex();
-
-            if(p == s) return true;
-
-            double factor = e.y() - s.y();
-
-            if(factor == 0) continue;
-
-            double t = (p.y()-s.y())/factor;
-
-
-            if((voronoiVertices.get(i).getType() == VertexType.INNER && t < 0 ) ||
-               (voronoiVertices.get(i + 1).getType() == VertexType.INNER && t > 1 ))
-                continue;
-
-            if((p.y() == s.y() && order*factor <= 0) ||
-               (t*(e.x()-s.x()) > p.x()) && p.y() != s.y()){
-                cross++;
-                order = Math.signum(factor);
-            }
+            if(vectProduct(diff(e, s), diff(p, s)) < 0) return false;
         }
 
-        return cross % 2 != 0;
+        if(voronoiVertices.get(0).getType() == VertexType.INNER){
+            Point s = voronoiVertices.get(voronoiVertices.size()-1).getVertex(),
+                  e = voronoiVertices.get(0).getVertex();
+            if(vectProduct(diff(e, s), diff(p, s)) < 0) return false;
+        }
+
+        return true;
     }
 
 }

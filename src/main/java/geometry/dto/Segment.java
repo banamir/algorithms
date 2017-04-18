@@ -1,5 +1,9 @@
 package geometry.dto;
 
+import geometry.utils.VectorOperations;
+
+import static geometry.utils.VectorOperations.*;
+
 public class Segment {
   private final Point start, end;
 
@@ -32,6 +36,8 @@ public class Segment {
   public double atan() {
     return Math.atan2(end.x() - start.x(), end.y() - start.y());
   }
+
+  public double length(){return VectorOperations.length(diff(end, start));}
 
   public static boolean isIntersect(Segment s1, Segment s2) {
     double a = s1.tg();

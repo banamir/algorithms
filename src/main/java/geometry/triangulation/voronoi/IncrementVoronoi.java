@@ -19,22 +19,17 @@ import static geometry.utils.VectorOperations.*;
  */
 public class IncrementVoronoi extends IncrementDelaunay {
 
-
-
-    protected HashMap<Point,TreeSet<Triangle>> vertexMap = new HashMap();
-
     protected HashSet<VoronoiTile> tiles = new HashSet();
 
     public IncrementVoronoi(List<Point> points){
-        super();
-        triangulate(points);
+        super(points);
 
         for(Entry entry : vertexMap.entrySet()){
             Point vertex = (Point) entry.getKey();
-            TreeSet<Triangle>  Ts = (TreeSet<Triangle>) entry.getValue();
+            Set<Triangle>  Ts = (Set<Triangle>) entry.getValue();
 
             List<VoronoiVertex> vs = new ArrayList<>();
-            Point outVertex = Ts.first().centroidCoord();
+            Point outVertex = Ts.iterator().next().centroidCoord();
 
             for(Triangle T : Ts){
 
@@ -54,20 +49,25 @@ public class IncrementVoronoi extends IncrementDelaunay {
             }
 
             final Point  base = outVertex;
-            vs.sort((VoronoiVertex v1, VoronoiVertex v2)-> {
-                Point  a = diff(v1.getVertex(),vertex),
-                       b = diff(v2.getVertex(),vertex),
-                       c = diff(base, vertex);
+            vs.sort((VoronoiVertex v1, VoronoiVertex v2) -> {
+                Point a = diff(v1.getVertex(), vertex),
+                      b = diff(v2.getVertex(), vertex),
+                      c = diff(base, vertex);
+
                 double angle1 = Math.atan2(vectProduct(a, c), scalarProduct(a, c));
-                if(angle1 < 0) angle1 += 2.*Math.PI;
-                double angle2 = Math.atan2(vectProduct(b, c),scalarProduct(b, c));
-                if(angle2 < 0) angle2 += 2.*Math.PI;
-                return Double.compare(angle1,angle2);
+                if (angle1 < 0) angle1 += 2. * Math.PI;
+
+                double angle2 = Math.atan2(vectProduct(b, c), scalarProduct(b, c));
+                if (angle2 < 0) angle2 += 2. * Math.PI;
+
+                return -Double.compare(angle1, angle2);
             });
 
-            tiles.add(new VoronoiTile(vertex,vs));
+            tiles.add(new VoronoiTile(vertex, vs));
         }
     }
+
+
 
 
     private Point addOutPoint(List<VoronoiVertex> vs,Triangle T,int i){
@@ -92,6 +92,7 @@ public class IncrementVoronoi extends IncrementDelaunay {
 
 
     public VoronoiTile tile(Point p){
+        int  i =  0;
         for(VoronoiTile tile : tiles){
             if(tile.contains(p)) return tile;
         }
@@ -102,50 +103,6 @@ public class IncrementVoronoi extends IncrementDelaunay {
         return tiles;
     }
 
-
-    @Override
-    protected void addTriangle(Triangle T) {
-        super.addTriangle(T);
-
-        for(int i =0; i<3; i++) {
-            Point v = T.vertex(i);
-
-            TreeSet<Triangle> Ts;
-            if (vertexMap.containsKey(v)) {
-                Ts = vertexMap.get(v);
-            } else {
-                Ts = new TreeSet<Triangle>((T1, T2) -> {
-                    Segment l1 = new Segment(v, T1.centroidCoord()),
-                            l2 = new Segment(v, T2.centroidCoord());
-                    return Double.compare(l1.atan(), l2.atan());
-                });
-                vertexMap.put(v, Ts);
-            }
-
-            Ts.add(T);
-        }
-    }
-
-    @Override
-    protected void removeTriangle(Triangle T){
-        super.removeTriangle(T);
-
-        for(int i = 0; i < 3; i++) {
-            Point v = T.vertex(i);
-            TreeSet<Triangle> Ts = vertexMap.get(v);
-
-            Ts.remove(T);
-            if(Ts.isEmpty()) {
-                vertexMap.remove(v);
-            }
-        }
-
-    }
-
-    public static void drawTile(Draw draw, List<VoronoiVertex> tile){
-
-        //for(VoronoiVertex vertex)
-    }
 
     public static void main(String[] args) {
         List<Point> verteses = new ArrayList();
@@ -162,9 +119,9 @@ public class IncrementVoronoi extends IncrementDelaunay {
         verteses.add(new Point(270,300)); //7
 
         verteses.add(new Point(420,350)); //8
-        verteses.add(new Point(380,450)); //9
+        verteses.add(new Point(380, 450)); //9
 
-        Collections.shuffle(verteses);
+        //Collections.shuffle(verteses);
 
         IncrementVoronoi triangulation = new IncrementVoronoi(verteses);
 
@@ -181,7 +138,7 @@ public class IncrementVoronoi extends IncrementDelaunay {
                 edges.add(T.side(i));
             }
             Point c = T.centroidCoord();
-           // draw.circle(c.x(),c.y(), length(diff(c,T.vertex(0))));
+
             System.out.println(c.toString());
         }
 
@@ -200,7 +157,6 @@ public class IncrementVoronoi extends IncrementDelaunay {
             for(int i =0; i < lv.size()-1; i++){
                 Point v1 = lv.get(i).getVertex();
                 Point v2 = lv.get(i+1).getVertex();
-                //draw.filledCircle(v1.x(),v1.y(),5.);
                 draw.line(v1.x(),v1.y(),v2.x(),v2.y());
             }
             if(lv.get(0).getType() == VoronoiVertex.VertexType.INNER){
@@ -210,6 +166,25 @@ public class IncrementVoronoi extends IncrementDelaunay {
             }
         }
 
+        draw.setPenColor(Color.CYAN);
+        Point p = new Point(450,300);//275,400
+        draw.filledCircle(p.x(), p.y(), 5);
+        VoronoiTile tile = triangulation.tile(p);
+        List<VoronoiVertex> lv = new ArrayList<>(tile.voronoiVertices());
+        System.out.println(lv.get(0).getVertex());
+        for(int i =0; i < lv.size()-1; i++){
+            Point v1 = lv.get(i).getVertex();
+            Point v2 = lv.get(i+1).getVertex();
+            draw.line(v1.x(),v1.y(),v2.x(),v2.y());
+            System.out.println(v2);
+        }
+        if(lv.get(0).getType() == VoronoiVertex.VertexType.INNER){
+            Point v1 = lv.get(0).getVertex();
+            Point v2 = lv.get(lv.size()-1).getVertex();
+            draw.line(v1.x(), v1.y(), v2.x(), v2.y());
+        }
+        draw.setPenColor(Color.BLACK);
+        draw.filledCircle(tile.getCenter().x(),tile.getCenter().y(),5);
 
 
     }

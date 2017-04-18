@@ -21,8 +21,6 @@ public class IncrementDelaunay extends AbstractTriangulation {
         super(points);
     }
 
-    protected IncrementDelaunay() {}
-
     @Override
     protected void triangulate(List<Point> points) {
 

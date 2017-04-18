@@ -2,6 +2,7 @@ package geometry.triangulation;
 
 import geometry.dto.Point;
 import geometry.dto.Segment;
+import geometry.graphs.EuclideanGraph;
 import geometry.triangulation.utils.Determinant;
 import geometry.utils.Visualiser;
 
@@ -14,7 +15,7 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
 
     private Set<Triangle> triangles = new HashSet();
 
-    protected AbstractTriangulation(){}
+    protected HashMap<Point,Set<Triangle>> vertexMap = new HashMap();
 
     public AbstractTriangulation(List<Point> points){
         triangulate(points);
@@ -25,6 +26,30 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
     public Iterator<Triangle> iterator(){
         return triangles.iterator();
     }
+
+    public EuclideanGraph graph(){
+
+        EuclideanGraph graph = new EuclideanGraph();
+
+        for(Point v : vertises()){
+            List<Triangle> triangles = getTriangles(v);
+            for(Triangle T : triangles){
+                for(int i = 0; i < 3; i++){
+                    if(T.vertex(i).equals(v)){
+                        graph.addEdge(v,T.vertex(i - 1));
+                        graph.addEdge(v,T.vertex(i + 1));
+                        break;
+                    }
+                }
+            }
+        }
+        return graph;
+    }
+
+    public Iterable<Point> vertises(){
+        return vertexMap.keySet();
+    }
+
 
     protected void addTriangle(Triangle T){
 
@@ -60,18 +85,42 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
             }
         }
         triangles.add(T);
+
+        //add triangles for a vertex map
+        for(int i =0; i<3; i++) {
+            Point v = T.vertex(i);
+
+            Set<Triangle> Ts;
+            if (vertexMap.containsKey(v)) {
+                Ts = vertexMap.get(v);
+            } else {
+                Ts = new HashSet<>();
+                vertexMap.put(v, Ts);
+            }
+
+            Ts.add(T);
+        }
     }
 
     protected void removeTriangle(Triangle T){
 
         for(int i = 0; i < 3; i++){
 
+            //remove neighbors
             Triangle neighbor = T.getNeighbor(i);
+            if(neighbor != null){
+                for(int j = 0; j < 3; j++){
+                    if(neighbor.getNeighbor(j) == T) neighbor.setNeighbor(j, null);
+                }
+            }
 
-            if(neighbor == null) continue;
+            //remove triangles from vertex hash map
+            Point v = T.vertex(i);
+            Set<Triangle> Ts = vertexMap.get(v);
+            Ts.remove(T);
 
-            for(int j = 0; j < 3; j++){
-                if(neighbor.getNeighbor(j) == T) neighbor.setNeighbor(j, null);
+            if(Ts.isEmpty()) {
+                vertexMap.remove(v);
             }
         }
         triangles.remove(T);
@@ -79,6 +128,9 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
 
     protected List<Triangle> getTriangles(Point p){
         List<Triangle> result = new ArrayList();
+
+        if(vertexMap.containsKey(p))
+            return new ArrayList<>(vertexMap.get(p));
 
         for(Triangle T : triangles){
             if(T.contains(p)) result.add(T); ;
@@ -137,5 +189,6 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
         }
         return D;
     }
+
 
 }

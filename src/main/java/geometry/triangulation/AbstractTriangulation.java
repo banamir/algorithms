@@ -126,7 +126,7 @@ public abstract class AbstractTriangulation implements Iterable<Triangle> {
         triangles.remove(T);
     }
 
-    protected List<Triangle> getTriangles(Point p){
+    public List<Triangle> getTriangles(Point p){
         List<Triangle> result = new ArrayList();
 
         if(vertexMap.containsKey(p))

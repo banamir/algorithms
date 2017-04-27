@@ -20,30 +20,37 @@ public class VectorOperations {
     }
 
     public static Point add(Point a, Point b){
+
         return new Point(a.x()+b.x(), a.y()+b.y());
     }
 
     public static Point mult(Point a, double alfa){
+
         return new Point(alfa*a.x(), alfa*a.y());
     }
 
     public static Point norm(Point a){
+
         return new Point(a.y(), -a.x());
     }
 
     public static double scalarProduct(Point a, Point b){
+
         return a.x()*b.x() +  a.y()*b.y();
     }
 
     public static double length(Point a){
+
         return sqrt(scalarProduct(a,a));
     }
 
     public static double square(Point a){
+
         return scalarProduct(a, a);
     }
 
     public static double vectProduct(Point a, Point b){
+
         return a.x()*b.y() - b.x()*a.y();
     }
 
@@ -65,6 +72,7 @@ public class VectorOperations {
     }
 
     public static boolean intersected(Segment s1, Segment s2){
+
         Point a = s1.start(), b = s1.end(),
               c = s2.start(), d = s2.end();
 
@@ -77,6 +85,7 @@ public class VectorOperations {
     }
 
     public static Point intersectPoint(Segment s1, Segment s2) {
+
         if(!intersected(s1,s2)) return  null;
 
         Point a = s1.start(), b = s1.end(),
@@ -99,7 +108,13 @@ public class VectorOperations {
         return new Point(D1/D,D2/D);
     }
 
+    public static Segment inverse(Segment s){
+
+        return new Segment(s.end(),s.start());
+    }
+
     public static boolean intersected(double a, double b, double c, double d) {
+
         double p;
         if(a > b) { p = a; a = b; b = p; }
         if(c > d) { p = c; c = d; d = p;  }

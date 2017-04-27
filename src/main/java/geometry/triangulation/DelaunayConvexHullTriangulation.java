@@ -10,9 +10,7 @@ import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
 
-/**
- * Created by banamir on 05.03.17.
- */
+
 public class DelaunayConvexHullTriangulation extends ConvexHullTriangulation {
 
     public DelaunayConvexHullTriangulation(List<Point > points){
@@ -32,7 +30,7 @@ public class DelaunayConvexHullTriangulation extends ConvexHullTriangulation {
 
     protected Entry<Triangle,Integer> getTriangleForUpdate(){
 
-        for(Triangle T : this){
+        for(Triangle T : triangles()){
             for(int i = 0; i< 3; i++){
                 if(canImprove(T, i))
                     return new AbstractMap.SimpleEntry<Triangle, Integer>(T, i);
@@ -65,7 +63,7 @@ public class DelaunayConvexHullTriangulation extends ConvexHullTriangulation {
         AbstractTriangulation triangulation = new DelaunayConvexHullTriangulation(verteses);
 
         Set<Segment> edges = new HashSet();
-        for(Triangle T : triangulation){
+        for(Triangle T : triangulation.triangles()){
             for(int i = 0; i < 3; i++){
                 edges.add(T.side(i));
             }

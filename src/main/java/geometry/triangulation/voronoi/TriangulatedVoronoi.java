@@ -13,15 +13,14 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import static geometry.utils.VectorOperations.*;
+import static geometry.utils.DrawHelper.*;
 
-/**
- * Created by banamir on 04.04.17.
- */
-public class IncrementVoronoi extends IncrementDelaunay {
+
+public class TriangulatedVoronoi extends IncrementDelaunay {
 
     protected HashSet<VoronoiTile> tiles = new HashSet();
 
-    public IncrementVoronoi(List<Point> points){
+    public TriangulatedVoronoi(List<Point> points){
         super(points);
 
         for(Entry entry : vertexMap.entrySet()){
@@ -29,11 +28,11 @@ public class IncrementVoronoi extends IncrementDelaunay {
             Set<Triangle>  Ts = (Set<Triangle>) entry.getValue();
 
             List<VoronoiVertex> vs = new ArrayList<>();
-            Point outVertex = Ts.iterator().next().centroidCoord();
+            Point outVertex = Ts.iterator().next().centroid();
 
             for(Triangle T : Ts){
 
-                Point c = T.centroidCoord();
+                Point c = T.centroid();
 
                 vs.add(new VoronoiVertex(c, VoronoiVertex.VertexType.INNER));
 
@@ -41,8 +40,9 @@ public class IncrementVoronoi extends IncrementDelaunay {
                     if(T.vertex(i) == vertex){
                         Point p = addOutPoint(vs,T,i - 1);
                         if(p != null) outVertex = p;
+
                         addOutPoint(vs,T, i);
-                        if(p != null) outVertex = p;
+
                         break;
                     }
                 }
@@ -71,10 +71,11 @@ public class IncrementVoronoi extends IncrementDelaunay {
 
 
     private Point addOutPoint(List<VoronoiVertex> vs,Triangle T,int i){
-        if(T.getNeighbor(i) != null) return null;
+
+        if(T.neighbor(i) != null) return null;
 
         Segment side = T.side(i);
-        Point c = T.centroidCoord(),
+        Point c = T.centroid(),
               s = side.start(), e = side.end();
         Point m  = mult(add(e, s), 0.5),
               sc = diff(c, s), cm = diff(m, c);
@@ -99,7 +100,8 @@ public class IncrementVoronoi extends IncrementDelaunay {
         return null;
     }
 
-    public HashSet<VoronoiTile> getTiles(){
+    public HashSet<VoronoiTile> tiles(){
+
         return tiles;
     }
 
@@ -123,7 +125,7 @@ public class IncrementVoronoi extends IncrementDelaunay {
 
         //Collections.shuffle(verteses);
 
-        IncrementVoronoi triangulation = new IncrementVoronoi(verteses);
+        TriangulatedVoronoi triangulation = new TriangulatedVoronoi(verteses);
 
         Draw draw = new Draw();
         draw.setCanvasSize(800, 600);
@@ -133,11 +135,11 @@ public class IncrementVoronoi extends IncrementDelaunay {
         draw.setPenColor(Color.GREEN);
 
         Set<Segment> edges = new HashSet();
-        for(Triangle T : triangulation){
+        for(Triangle T : triangulation.triangles()){
             for(int i = 0; i < 3; i++) {
                 edges.add(T.side(i));
             }
-            Point c = T.centroidCoord();
+            Point c = T.centroid();
 
             System.out.println(c.toString());
         }
@@ -152,42 +154,25 @@ public class IncrementVoronoi extends IncrementDelaunay {
         DrawHelper.drawPoints(draw, verteses, 5.);
 
         draw.setPenColor(Color.MAGENTA);
-        for(VoronoiTile tile : triangulation.getTiles()){
-            List<VoronoiVertex> lv = new ArrayList<>(tile.voronoiVertices());
-            for(int i =0; i < lv.size()-1; i++){
-                Point v1 = lv.get(i).getVertex();
-                Point v2 = lv.get(i+1).getVertex();
-                draw.line(v1.x(),v1.y(),v2.x(),v2.y());
-            }
-            if(lv.get(0).getType() == VoronoiVertex.VertexType.INNER){
-                Point v1 = lv.get(0).getVertex();
-                Point v2 = lv.get(lv.size()-1).getVertex();
-                draw.line(v1.x(),v1.y(),v2.x(),v2.y());
-            }
+        for(VoronoiTile tile : triangulation.tiles()){
+            drawVoronoiTile(draw, tile);
         }
 
         draw.setPenColor(Color.CYAN);
         Point p = new Point(450,300);//275,400
         draw.filledCircle(p.x(), p.y(), 5);
+
         VoronoiTile tile = triangulation.tile(p);
-        List<VoronoiVertex> lv = new ArrayList<>(tile.voronoiVertices());
-        System.out.println(lv.get(0).getVertex());
-        for(int i =0; i < lv.size()-1; i++){
-            Point v1 = lv.get(i).getVertex();
-            Point v2 = lv.get(i+1).getVertex();
-            draw.line(v1.x(),v1.y(),v2.x(),v2.y());
-            System.out.println(v2);
-        }
-        if(lv.get(0).getType() == VoronoiVertex.VertexType.INNER){
-            Point v1 = lv.get(0).getVertex();
-            Point v2 = lv.get(lv.size()-1).getVertex();
-            draw.line(v1.x(), v1.y(), v2.x(), v2.y());
-        }
+
+        drawVoronoiTile(draw, tile);
+
         draw.setPenColor(Color.BLACK);
         draw.filledCircle(tile.getCenter().x(),tile.getCenter().y(),5);
 
 
     }
+
+
 
 
 }

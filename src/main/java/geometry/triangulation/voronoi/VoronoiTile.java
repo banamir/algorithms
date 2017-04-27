@@ -8,9 +8,7 @@ import java.util.List;
 import static geometry.triangulation.voronoi.VoronoiVertex.*;
 import static geometry.utils.VectorOperations.*;
 
-/**
- * Created by banamir on 13.04.17.
- */
+
 public class VoronoiTile {
 
     private Point center;

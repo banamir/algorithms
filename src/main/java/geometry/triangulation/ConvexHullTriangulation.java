@@ -11,9 +11,7 @@ import java.util.List;
 
 import static geometry.convexhull.GrahamScan.convexHull;
 
-/**
- * Created by banamir on 05.03.17.
- */
+
 public class ConvexHullTriangulation extends AbstractTriangulation {
 
     public ConvexHullTriangulation(List<Point> points){
@@ -84,7 +82,7 @@ public class ConvexHullTriangulation extends AbstractTriangulation {
         AbstractTriangulation triangulation = new ConvexHullTriangulation(verteses);
 
         Set<Segment> edges = new HashSet();
-        for(Triangle T : triangulation){
+        for(Triangle T : triangulation.triangles()){
             for(int i = 0; i < 3; i++){
                 edges.add(T.side(i));
             }

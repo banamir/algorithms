@@ -12,9 +12,7 @@ import java.util.List;
 import static geometry.utils.VectorOperations.length;
 import static geometry.utils.VectorOperations.onSegment;
 
-/**
- * Created by banamir on 09.03.17.
- */
+
 public class IncrementDelaunay extends AbstractTriangulation {
 
     public IncrementDelaunay(List<Point> points){
@@ -30,7 +28,7 @@ public class IncrementDelaunay extends AbstractTriangulation {
 
         for(Point p : points){
 
-            List<Triangle> oldTs = this.getTriangles(p);
+            List<Triangle> oldTs = this.pointTriangles(p);
             List<Triangle> newTs = new ArrayList();
 
             for(Triangle To : oldTs){
@@ -49,7 +47,7 @@ public class IncrementDelaunay extends AbstractTriangulation {
         }
 
         for(Point v : baseVerteses){
-            List<Triangle> Ts = this.getTriangles(v);
+            List<Triangle> Ts = this.pointTriangles(v);
             for(Triangle T : Ts){
                 this.removeTriangle(T);
             }
@@ -121,7 +119,7 @@ public class IncrementDelaunay extends AbstractTriangulation {
 
 
         Set<Segment> edges = new HashSet();
-        for(Triangle T : triangulation){
+        for(Triangle T : triangulation.triangles()){
             for(int i = 0; i < 3; i++){
                 edges.add(T.side(i));
             }

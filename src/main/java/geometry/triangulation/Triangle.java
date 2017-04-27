@@ -7,9 +7,7 @@ import geometry.triangulation.utils.Determinant;
 import static geometry.triangulation.utils.Determinant.det;
 import static geometry.utils.VectorOperations.*;
 
-/**
- * Created by banamir on 04.03.17.
- */
+
 public class Triangle {
 
     private Point[] verteses = new Point[3];
@@ -19,7 +17,9 @@ public class Triangle {
     private Point incenter = null;
 
     public Triangle(Point p_i, Point p_j, Point p_k){
+
         verteses[0] = p_i;
+
         if(vectProduct(diff(p_j,p_i), diff(p_k,p_j)) >= 0){
             verteses[1] = p_j;
             verteses[2] = p_k;
@@ -27,11 +27,6 @@ public class Triangle {
             verteses[1] = p_k;
             verteses[2] = p_j;
         }
-    }
-
-    private int index(int i) {
-        int r = i % 3;
-        return (r >= 0)? r : r  + 3;
     }
 
     public Segment side(int i){
@@ -42,34 +37,28 @@ public class Triangle {
         return verteses[index(i)];
     }
 
-    public void setNeighbor(int i, Triangle T){
+    public void neighbor(int i, Triangle T){
+
         neighbors[index(i)] = T;
     }
 
-    public Triangle getNeighbor(int i){
+    public Triangle neighbor(int i){
+
        return neighbors[index(i)];
     }
 
     public boolean contains(Point p){
+
         for(int i = 0; i <= verteses.length; i++){
-            if(vectProduct(diff(vertex(i+1),vertex(i)), diff(p, vertex(i))) < 0.d){
+            if(vectProduct(diff(vertex(i + 1), vertex(i)), diff(p, vertex(i))) < 0.d){
                 return false;
             }
         }
         return true;
     }
 
-    public boolean contains(Segment edge){
-        for(int i = 0; i < 3; i++){
-            Segment e = this.side(i);
-            if(edge.equals(e) || edge.equals(new Segment(e.end(), e.start()))){
-                return true;
-            }
-        }
-        return false;
-    }
 
-    public Point centroidCoord(){
+    public Point centroid(){
 
         if(incenter != null ) return incenter;
 
@@ -89,5 +78,10 @@ public class Triangle {
         double Dx = det(Mx,3), Dy = det(My,3), D = det(M, 3);
 
         return new Point(-0.5*Dx/D,0.5*Dy/D);
+    }
+
+    private int index(int i) {
+        int r = i % 3;
+        return (r >= 0)? r : r  + 3;
     }
 }

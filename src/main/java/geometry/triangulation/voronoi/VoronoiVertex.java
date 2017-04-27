@@ -2,10 +2,6 @@ package geometry.triangulation.voronoi;
 
 import geometry.dto.Point;
 
-/**
- * Created by banamir on 06.04.17.
- */
-
 
 public class VoronoiVertex{
 

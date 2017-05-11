@@ -13,26 +13,26 @@ import java.util.Map.Entry;
 
 public class DelaunayConvexHullTriangulation extends ConvexHullTriangulation {
 
-    public DelaunayConvexHullTriangulation(List<Point > points){
+    public DelaunayConvexHullTriangulation(List<Point> points) {
         super(points);
     }
 
-    protected void triangulate(List<Point> points){
+    protected void triangulate(List<Point> points) {
         super.triangulate(points);
 
         Entry<Triangle, Integer> pair;
 
-        while ((pair = getTriangleForUpdate()) != null){
+        while ((pair = getTriangleForUpdate()) != null) {
             flip(pair.getKey(), pair.getValue());
         }
 
     }
 
-    protected Entry<Triangle,Integer> getTriangleForUpdate(){
+    protected Entry<Triangle, Integer> getTriangleForUpdate() {
 
-        for(Triangle T : triangles()){
-            for(int i = 0; i< 3; i++){
-                if(canImprove(T, i))
+        for (Triangle T : triangles()) {
+            for (int i = 0; i < 3; i++) {
+                if (canImprove(T, i))
                     return new AbstractMap.SimpleEntry<Triangle, Integer>(T, i);
             }
         }
@@ -40,45 +40,39 @@ public class DelaunayConvexHullTriangulation extends ConvexHullTriangulation {
         return null;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         List<Point> verteses = new ArrayList();
 
-        verteses.add(new Point(375,25));  //1
-        verteses.add(new Point(500,150)); //2
-        verteses.add(new Point(250,200)); //3
+        verteses.add(new Point(375, 25));  //1
+        verteses.add(new Point(500, 150)); //2
+        verteses.add(new Point(250, 200)); //3
 
-        verteses.add(new Point(400,225)); //4
+        verteses.add(new Point(400, 225)); //4
 
-        verteses.add(new Point(600,300)); //5
-        verteses.add(new Point(375,300)); //6
-        verteses.add(new Point(270,300)); //7
+        verteses.add(new Point(600, 300)); //5
+        verteses.add(new Point(375, 300)); //6
+        verteses.add(new Point(270, 300)); //7
 
-        verteses.add(new Point(420,350)); //8
-        verteses.add(new Point(380,450)); //9
+        verteses.add(new Point(420, 350)); //8
+        verteses.add(new Point(380, 450)); //9
 
 
         Collections.shuffle(verteses);
 
         AbstractTriangulation triangulation = new DelaunayConvexHullTriangulation(verteses);
 
-        Set<Segment> edges = new HashSet();
-        for(Triangle T : triangulation.triangles()){
-            for(int i = 0; i < 3; i++){
-                edges.add(T.side(i));
-            }
-        }
-
-        List<Segment> segments = new ArrayList<>();
-        segments.addAll(edges);
-
         Draw draw = new Draw();
+        DrawHelper helper = new DrawHelper(draw);
+
         draw.setCanvasSize(800, 600);
-        draw.setXscale(0,800);
-        draw.setYscale(0,600);
+        draw.setXscale(0, 800);
+        draw.setYscale(0, 600);
+
         draw.setPenColor(Color.RED);
-        DrawHelper.drawSegments(draw,segments);
+        helper.draw(triangulation.graph());
+
         draw.setPenColor(Color.BLUE);
-        DrawHelper.drawPoints(draw,verteses,5.);
+        helper.draw(verteses, 5.);
     }
 }

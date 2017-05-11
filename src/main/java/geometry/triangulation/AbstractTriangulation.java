@@ -5,42 +5,42 @@ import geometry.dto.Segment;
 import geometry.graphs.EuclideanGraph;
 import geometry.triangulation.utils.Determinant;
 
-import static geometry.utils.VectorOperations.*;
-
 import java.util.*;
+
+import static geometry.utils.VectorOperations.inverse;
 
 public abstract class AbstractTriangulation {
 
     private Set<Triangle> triangles = new HashSet();
 
-    protected HashMap<Point,Set<Triangle>> vertexMap = new HashMap();
+    protected HashMap<Point, Set<Triangle>> vertexMap = new HashMap();
 
-    public AbstractTriangulation(List<Point> points){
+    public AbstractTriangulation(List<Point> points) {
         triangulate(points);
     }
 
     abstract protected void triangulate(List<Point> points);
 
 
-    public Iterable<Triangle> triangles(){
+    public Iterable<Triangle> triangles() {
         return triangles;
     }
 
-    public Iterable<Point> vertises(){
+    public Iterable<Point> vertises() {
         return vertexMap.keySet();
     }
 
-    public EuclideanGraph graph(){
+    public EuclideanGraph graph() {
 
         EuclideanGraph graph = new EuclideanGraph();
 
-        for(Point v : vertises()){
+        for (Point v : vertises()) {
             List<Triangle> triangles = pointTriangles(v);
-            for(Triangle T : triangles){
-                for(int i = 0; i < 3; i++){
-                    if(T.vertex(i).equals(v)){
-                        graph.addEdge(v,T.vertex(i - 1));
-                        graph.addEdge(v,T.vertex(i + 1));
+            for (Triangle T : triangles) {
+                for (int i = 0; i < 3; i++) {
+                    if (T.vertex(i).equals(v)) {
+                        graph.addEdge(v, T.vertex(i - 1));
+                        graph.addEdge(v, T.vertex(i + 1));
                         break;
                     }
                 }
@@ -49,41 +49,41 @@ public abstract class AbstractTriangulation {
         return graph;
     }
 
-    public List<Triangle> pointTriangles(Point p){
+    public List<Triangle> pointTriangles(Point p) {
 
         List<Triangle> result = new ArrayList();
 
-        if(vertexMap.containsKey(p))
+        if (vertexMap.containsKey(p))
             return new ArrayList<>(vertexMap.get(p));
 
-        for(Triangle T : triangles){
-            if(T.contains(p)) result.add(T); ;
+        for (Triangle T : triangles) {
+            if (T.contains(p)) result.add(T);
+            ;
         }
 
         return result;
     }
 
-    public boolean contains(Triangle T){
+    public boolean contains(Triangle T) {
         return triangles.contains(T);
     }
 
 
-    protected void addTriangle(Triangle T){
+    protected void addTriangle(Triangle T) {
 
         //establish neighbor triangles
-        for(int i =0; i < 3; i++){
+        for (int i = 0; i < 3; i++) {
 
             Segment side = T.side(i);
-            List<Triangle> list = new ArrayList();
 
-            for(Triangle t : triangles){
-                for(int j = 0; j < 3; j++){
+            for (Triangle t : triangles) {
+                for (int j = 0; j < 3; j++) {
 
                     Segment s = t.side(j);
 
-                    if(side.equals(s) || side.equals(inverse(s)) && !T.equals(t)){
-                        t.neighbor(j,T);
-                        T.neighbor(i,t);
+                    if (side.equals(s) || side.equals(inverse(s)) && !T.equals(t)) {
+                        t.neighbor(j, T);
+                        T.neighbor(i, t);
                         break;
                     }
                 }
@@ -92,7 +92,7 @@ public abstract class AbstractTriangulation {
         triangles.add(T);
 
         //add triangles for a vertex map
-        for(int i =0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             Point v = T.vertex(i);
 
             Set<Triangle> Ts;
@@ -107,15 +107,15 @@ public abstract class AbstractTriangulation {
         }
     }
 
-    protected void removeTriangle(Triangle T){
+    protected void removeTriangle(Triangle T) {
 
-        for(int i = 0; i < 3; i++){
+        for (int i = 0; i < 3; i++) {
 
             //remove neighbors
             Triangle neighbor = T.neighbor(i);
-            if(neighbor != null){
-                for(int j = 0; j < 3; j++){
-                    if(neighbor.neighbor(j) == T) neighbor.neighbor(j, null);
+            if (neighbor != null) {
+                for (int j = 0; j < 3; j++) {
+                    if (neighbor.neighbor(j) == T) neighbor.neighbor(j, null);
                 }
             }
 
@@ -124,36 +124,36 @@ public abstract class AbstractTriangulation {
             Set<Triangle> Ts = vertexMap.get(v);
             Ts.remove(T);
 
-            if(Ts.isEmpty()) {
+            if (Ts.isEmpty()) {
                 vertexMap.remove(v);
             }
         }
         triangles.remove(T);
     }
 
-    protected  boolean canImprove(Triangle T, int side){
+    protected boolean canImprove(Triangle T, int side) {
 
-        if(T.neighbor(side) == null) return false;
+        if (T.neighbor(side) == null) return false;
 
-        Point   A = T.vertex(0),
-                B = T.vertex(1),
-                C = T.vertex(2),
-                D = findNeighborPoint(T, side);
+        Point A = T.vertex(0),
+              B = T.vertex(1),
+              C = T.vertex(2),
+              D = findNeighborPoint(T, side);
 
         double det[][] =
-                {{A.x(),A.y(), A.x()*A.x() + A.y()*A.y(), 1.},
-                 {B.x(),B.y(), B.x()*B.x() + B.y()*B.y(), 1.},
-                 {C.x(),C.y(), C.x()*C.x() + C.y()*C.y(), 1.},
-                 {D.x(),D.y(), D.x()*D.x() + D.y()*D.y(), 1.}};
+                {{A.x(), A.y(), A.x() * A.x() + A.y() * A.y(), 1.},
+                        {B.x(), B.y(), B.x() * B.x() + B.y() * B.y(), 1.},
+                        {C.x(), C.y(), C.x() * C.x() + C.y() * C.y(), 1.},
+                        {D.x(), D.y(), D.x() * D.x() + D.y() * D.y(), 1.}};
 
         return Determinant.det(det, 4) > 0;
     }
 
-    protected List<Triangle> flip(Triangle T, int side){
+    protected List<Triangle> flip(Triangle T, int side) {
 
         Triangle neighbor = T.neighbor(side);
 
-        Point A = T.vertex(side),     B = T.vertex(side + 1),
+        Point A = T.vertex(side), B = T.vertex(side + 1),
               C = T.vertex(side + 2), D = findNeighborPoint(T, side);
 
         Triangle T1 = new Triangle(C, B, D),
@@ -168,13 +168,14 @@ public abstract class AbstractTriangulation {
 
     }
 
-    protected Point findNeighborPoint(Triangle T, int side){
+    protected Point findNeighborPoint(Triangle T, int side) {
         Triangle neighbor = T.neighbor(side);
 
-        for(int j  = 0; j < 3; j ++){
-            if(neighbor.neighbor(j) == T) {
+        for (int j = 0; j < 3; j++) {
+            if (neighbor.neighbor(j) == T) {
                 return neighbor.vertex(j + 2);
-            };
+            }
+            ;
         }
         return null;
     }
